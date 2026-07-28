@@ -1,5 +1,5 @@
 {
-  "name": "alcovia-offline-study-server",
+  "name": "focussync-server",
   "version": "0.1.0",
   "private": true,
   "scripts": {

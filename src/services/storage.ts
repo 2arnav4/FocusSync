@@ -4,7 +4,7 @@ import { DeviceId } from "@/types";
 const STORAGE_VERSION = "v1";
 
 export function getDeviceStorageKey(deviceId: DeviceId, key: string): string {
-  return `alcovia:${STORAGE_VERSION}:${deviceId}:${key}`;
+  return `focussync:${STORAGE_VERSION}:${deviceId}:${key}`;
 }
 
 export async function saveDeviceJson<T>(deviceId: DeviceId, key: string, value: T): Promise<void> {
@@ -18,12 +18,12 @@ export async function loadDeviceJson<T>(deviceId: DeviceId, key: string): Promis
 
 export async function clearDeviceState(deviceId: DeviceId): Promise<void> {
   const keys = await AsyncStorage.getAllKeys();
-  const deviceKeys = keys.filter((key) => key.startsWith(`alcovia:${STORAGE_VERSION}:${deviceId}:`));
+  const deviceKeys = keys.filter((key) => key.startsWith(`focussync:${STORAGE_VERSION}:${deviceId}:`));
   await AsyncStorage.multiRemove(deviceKeys);
 }
 
 export async function clearAllDeviceStates(): Promise<void> {
   const keys = await AsyncStorage.getAllKeys();
-  const deviceKeys = keys.filter((key) => key.startsWith(`alcovia:${STORAGE_VERSION}:`));
+  const deviceKeys = keys.filter((key) => key.startsWith(`focussync:${STORAGE_VERSION}:`));
   await AsyncStorage.multiRemove(deviceKeys);
 }

@@ -2,13 +2,13 @@
 
 ## Basic App Setup
 
-There is no login because the assignment asks for one hardcoded account. Both devices use `student_1`.
+There is no login. The interesting problem here is offline conflict resolution, not authentication, so the app runs on one hardcoded account and every device uses `student_1`.
 
 The phone, laptop and tablet profiles have separate AsyncStorage keys. This lets one browser act like multiple devices without the profiles reading the same local data.
 
 Redux stores the current screen data. AsyncStorage saves that data and the pending operation queue. The screen updates first, so the student does not have to wait for the internet.
 
-## Feature A: Focus Sessions
+## Focus Sessions
 
 The student chooses a target and starts a session. Starting, completing and failing are saved as separate operations. This is why the complete flow works while the device is offline and can sync later.
 
@@ -24,7 +24,7 @@ The stable `sessionId` is used as the reward key. Replaying the same success doe
 
 While a session is running, the app saves its last active time and the time it first went away. If the page is refreshed or the app is reopened, these saved values are checked before the timer continues. More than five seconds away records `app_switch`; a shorter restart resumes from the original start time.
 
-## Feature B: Syllabus Progress
+## Syllabus Progress
 
 Every subject contains chapters and every chapter contains tasks. A task can be Not Started, In Progress or Done. Changing the status updates Redux immediately, so chapter and subject progress also changes immediately while offline.
 
@@ -42,9 +42,9 @@ done = 2
 
 The higher value wins. Done therefore beats In Progress even if the operations reach Express in the opposite order. Delete wins against an edit, and the deleted task remains as a tombstone so an older edit cannot bring it back. A tombstone always stores the same neutral task status, so its hidden data also converges in every arrival order.
 
-This was the most difficult part of Feature B. The rule had to give the same result in every arrival order without trusting either device clock.
+This was the hardest part of the app to get right. The rule had to give the same result in every arrival order without trusting either device clock.
 
-## Feature C: n8n Automation
+## n8n Automation
 
 Express creates an automation event only after it accepts a valid focus success. The event id is `focus-success:<sessionId>`.
 
@@ -109,13 +109,13 @@ We resolved an overlap issue on mobile layouts. Because the bottom bar was posit
 
 ## Storage Choice
 
-AsyncStorage was chosen because it works with Expo and is enough for the amount of data in this assignment.
+AsyncStorage was chosen because it works with Expo out of the box and is enough for the amount of data the app holds.
 
 Express uses atomically written JSON files. This keeps the backend easy to run and lets operation ids, rewards and automation deliveries survive a normal local process restart. A production version should use SQLite or Postgres with unique constraints. Local files on a free hosting service may be replaced during a redeploy.
 
 ## Main Tradeoff
 
-After sync, the server returns the full merged state instead of only returning the changed records. This makes the sync code easier to understand and makes convergence easy to demonstrate. It sends more data than a delta-sync design, but the assignment data is small enough for this choice.
+After sync, the server returns the full merged state instead of only returning the changed records. This makes the sync code easier to understand and makes convergence easy to demonstrate, since both devices always replace their local state with the same server state. It sends more data than a delta-sync design, but the per-student dataset is a few subjects and a few sessions, so the payload stays small. At a larger data size this is the first thing I would change.
 
 ## n8n First and Express Migration
 
@@ -125,32 +125,28 @@ The final app uses the same reward rule inside Express. Express was chosen for t
 
 The n8n version is useful for testing a rule quickly. Its fallback is the Express version, which is better when the rule needs strict validation, durable storage and safe sync behavior.
 
-## Requirement Check
+## What Is Built
 
-Feature A is built: offline start, automatic success, Give Up, five-second app-switch failure, server timing checks and one reward per session.
+Focus sessions: offline start, automatic success, Give Up, five-second app-switch failure, server-side timing checks and exactly one reward per session.
 
-Feature B is built: offline task edits, instant chapter and subject progress, progress-rank conflicts, delete tombstones and duplicate handling.
+Syllabus progress: offline task edits, instant chapter and subject progress, progress-rank conflict resolution, delete tombstones and duplicate handling.
 
-Feature C is built: server-confirmed events, a real exported n8n workflow, a mock notification sink, duplicate protection and notifications displayed in the app.
+Automation: server-confirmed events, an exported n8n workflow, a mock notification sink, duplicate protection and notifications displayed back inside the app.
 
-The core two-device setup is built using separate phone and laptop storage. The Sync Lab can show divergence, convergence, status conflicts, delete conflicts and duplicate replays.
+Multi-device behaviour runs on separate per-profile storage. The Sync Lab can demonstrate divergence, convergence, status conflicts, delete conflicts and duplicate replays across phone, laptop and tablet profiles. When Express rejects a lower progress edit or an edit made after a deletion, it returns a conflict notice, and the Sync Lab shows which rule fired and which value was kept.
 
-The frontend and backend use TypeScript. The frontend is React Native with Expo Router, the backend is Express, and no off-the-shelf sync product is used.
+The sync layer is written from scratch rather than delegated to an off-the-shelf sync product, which is the point of the project. Frontend and backend are both TypeScript: React Native with Expo Router on the client, Express on the server.
 
-The backend also has a random convergence test. It creates task status edits, deletes, duplicates and different arrival orders, then checks that every order produces the same task state.
+The backend has a randomised convergence test. It generates task status edits, deletes, duplicates and shuffled arrival orders, then asserts that every ordering produces the same final task state.
 
-The Sync Lab supports phone, laptop and tablet. When Express has to reject a lower progress edit or an edit made after deletion, it returns a conflict notice. The Sync Lab shows the rule that was used and the value that was kept.
-
-## Optional Extensions
-
-The following extensions are not part of the completed core assignment:
+## Still Open
 
 - A user-facing screen for conflicts that need a manual choice
 - Delta sync that returns only changes instead of the full merged state
 - A two-way notification reply flow
-- A real-phone Expo Go demo
+- A real-phone Expo Go build
 
-Real WhatsApp delivery was also not added. The assignment allows the current mock HTTP notification sink, so this does not leave a core requirement incomplete.
+Real WhatsApp delivery is not wired up either. The current mock HTTP notification sink exercises the same code path, so swapping it for a provider is a URL change rather than a rewrite.
 
 n8n workflow 
 ![alt text](image.png)

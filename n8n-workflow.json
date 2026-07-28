@@ -1,10 +1,10 @@
 {
-  "name": "Alcovia Focus Success Notification",
+  "name": "Focus Success Notification",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "alcovia-focus-success",
+        "path": "focussync-focus-success",
         "responseMode": "lastNode",
         "options": {}
       },
@@ -16,7 +16,7 @@
         -420,
         0
       ],
-      "webhookId": "alcovia-focus-success"
+      "webhookId": "focussync-focus-success"
     },
     {
       "parameters": {

@@ -41,7 +41,7 @@ export function AppShell({ children }: PropsWithChildren) {
     <SafeAreaView className="flex-1 bg-[#f5f2ff]">
       <View className="flex-1 md:flex-row">
         <View className="hidden w-72 bg-violetDeep p-5 md:flex">
-          <Text className="text-3xl font-bold text-white">Alcovia</Text>
+          <Text className="text-3xl font-bold text-white">FocusSync</Text>
           <Text className="mt-1 text-sm font-semibold text-white/70">Offline Study Coach</Text>
           <View className="mt-6 gap-2">
             {navItems.map((item) => (

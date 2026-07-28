@@ -1,10 +1,10 @@
 {
-  "name": "Alcovia Reward Rule Prototype",
+  "name": "Reward Rule Prototype",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "alcovia-reward-prototype",
+        "path": "focussync-reward-prototype",
         "responseMode": "lastNode",
         "options": {}
       },
@@ -13,7 +13,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [-300, 0],
-      "webhookId": "alcovia-reward-prototype"
+      "webhookId": "focussync-reward-prototype"
     },
     {
       "parameters": {

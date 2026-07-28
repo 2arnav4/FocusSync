@@ -22,5 +22,5 @@ app.use("/api/notifications", notificationsRouter);
 app.use("/api/reset", resetRouter);
 
 app.listen(port, () => {
-  console.log(`Alcovia API listening on http://localhost:${port}`);
+  console.log(`FocusSync API listening on http://localhost:${port}`);
 });

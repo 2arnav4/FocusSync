@@ -1,6 +1,6 @@
-# Alcovia Offline Study
+# FocusSync
 
-Alcovia is an offline-first study app built for the Full Stack Engineering Intern assignment. It uses TypeScript, React Native with Expo, Express and n8n.
+FocusSync is an offline-first study app. A student can run focus sessions and update syllabus progress with no network connection, and two devices that made conflicting edits while offline converge on the same state once they sync. It is built with TypeScript, React Native with Expo, Express and n8n.
 
 The app has one hardcoded student, `student_1`, and three device profiles: `phone`, `laptop` and `tablet`. Each device keeps its own saved state and pending changes, so the profiles behave like separate devices in one browser.
 
@@ -18,10 +18,10 @@ The app has one hardcoded student, `student_1`, and three device profiles: `phon
 
 ## Run the Frontend with the Hosted Backend
 
-Create a root `.env` file:
+Create a root `.env` file pointing at your deployed backend:
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=https://alcovia-a2dg.onrender.com
+EXPO_PUBLIC_API_BASE_URL=https://YOUR-PUBLIC-BACKEND
 EXPO_PUBLIC_FOCUS_TEST_MODE=false
 ```
 
@@ -68,7 +68,7 @@ npm run server
 
 ## One-Minute Demo Mode
 
-The assignment uses focus sessions from 25 to 120 minutes. A one-minute option is included only to make the recorded demo practical.
+Focus sessions normally run from 25 to 120 minutes. A one-minute option exists only so the offline and sync behaviour can be demonstrated without waiting out a full session.
 
 Set both values to `true` and restart the frontend and backend:
 
@@ -77,7 +77,7 @@ EXPO_PUBLIC_FOCUS_TEST_MODE=true
 FOCUS_TEST_MODE=true
 ```
 
-Keep both values disabled for the normal assignment behavior.
+Keep both values disabled for normal session lengths.
 
 ## n8n Setup
 
@@ -87,7 +87,7 @@ Keep both values disabled for the normal assignment behavior.
 4. Put the public notification sink URL in `NOTIFICATION_SINK_URL`.
 5. Restart or redeploy Express after changing the environment variables.
 
-After Express confirms a successful focus session, it sends one event to n8n. n8n calls the mock notification sink, and the Alerts page displays the saved notification. The assignment allows this mock HTTP sink instead of a real WhatsApp provider.
+After Express confirms a successful focus session, it sends one event to n8n. n8n calls the notification sink, and the Alerts page displays the saved notification. The sink is a mock HTTP endpoint standing in for a real messaging provider, so the automation can be exercised end to end without a WhatsApp Business account.
 
 `n8n-reward-prototype.json` is a separate optional workflow. It shows the first, quick version of the reward rule inside n8n: add 50 coins once for each `sessionId` and advance the streak only once on the same UTC day. The app does not use this workflow in production. The final rule lives in Express because the backend can validate session timing and save rewards together with the synced state.
 
@@ -103,7 +103,7 @@ The higher progress wins when two devices change the same task. A deletion is ke
 
 These rules do not use device time, because phone and laptop clocks may disagree.
 
-## Choices Made Where the Assignment Was Open
+## Tunable Rules
 
 - The background grace period is five seconds.
 - A successful focus session gives 50 coins.
@@ -117,12 +117,12 @@ These rules do not use device time, because phone and laptop clocks may disagree
 The frontend uses AsyncStorage. Phone and laptop have separate keys:
 
 ```text
-alcovia:v1:phone:redux-state
-alcovia:v1:laptop:redux-state
-alcovia:v1:tablet:redux-state
+focussync:v1:phone:redux-state
+focussync:v1:laptop:redux-state
+focussync:v1:tablet:redux-state
 ```
 
-Express stores its state in JSON files inside `server/data`. This is suitable for the assignment and local testing. A real production deployment should use a database with unique constraints. A free hosting service may replace its local files during a redeploy.
+Express stores its state in JSON files inside `server/data`. This keeps the project easy to run locally with no database to provision. A production deployment should use a database with unique constraints instead, since a free hosting service may replace local files during a redeploy.
 
 ## Main Files
 
@@ -138,4 +138,4 @@ Express stores its state in JSON files inside `server/data`. This is suitable fo
 
 ## Not Included
 
-Real WhatsApp delivery and a real-phone Expo Go demo are not included. The mock notification sink and web clients meet the assignment requirements. The optional extensions that are still open are listed in `DECISIONS.md`.
+Real WhatsApp delivery and a real-phone Expo Go build are not wired up. The code is React Native and runs on a device through Expo Go, but the sync and conflict behaviour is easiest to demonstrate with several browser profiles side by side, so that is what the setup above targets. Remaining ideas are listed in `DECISIONS.md`.

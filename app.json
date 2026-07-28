@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Alcovia Offline Study",
-    "slug": "alcovia-offline-study",
+    "name": "FocusSync",
+    "slug": "focussync",
     "version": "0.1.0",
     "orientation": "portrait",
-    "scheme": "alcovia",
+    "scheme": "focussync",
     "userInterfaceStyle": "light",
     "web": {
       "bundler": "metro",
