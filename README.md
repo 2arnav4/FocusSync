@@ -103,6 +103,34 @@ The higher progress wins when two devices change the same task. A deletion is ke
 
 These rules do not use device time, because phone and laptop clocks may disagree.
 
+## Tests
+
+The sync rules above are the part most likely to break silently, so they are the
+part under test.
+
+```bash
+cd server
+npm install
+npm test
+```
+
+Seven tests, run with the built-in Node test runner through `tsx`:
+
+- `taskMerge.test.ts` covers the merge itself, including **random offline task
+  operations converge in every tested arrival order**. It generates operation
+  sequences, replays them in different orders, and asserts every device lands on
+  the same final state. That is the property that actually matters, because in
+  practice you never control which device syncs first.
+- `taskMerge.test.ts` also asserts **delete wins over every status edit**, and
+  that replaying an already-applied `operationId` changes nothing.
+- `sessionTiming.test.ts` covers the grace period and session outcomes.
+- `rewardPolicy.test.ts` covers reward counting.
+
+Because the merge only ever moves status forward and treats deletion as a
+tombstone that dominates, applying the same set of operations in any order gives
+the same result. Ordering is not something the code has to get right, which is
+why there is no vector clock or timestamp comparison anywhere in it.
+
 ## Tunable Rules
 
 - The background grace period is five seconds.
